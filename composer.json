@@ -1,0 +1,21 @@
+{
+  "name": "barlito/utils",
+  "description": "My personal library of utilities",
+  "type": "package",
+  "require": {
+    "php": ">=8.0.2"
+  },
+  "license": "mit",
+  "authors": [
+    {
+      "name": "barlito",
+      "email": "axelbarlet16@gmail.com",
+      "homepage": "https://github.com/barlito"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Barlito\\Utils\\": "src/"
+    }
+  }
+}
