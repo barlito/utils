@@ -34,12 +34,11 @@ return (new PhpCsFixer\Config())
                    'yoda_style' => true,
                    'blank_line_after_opening_tag' => true,
                    'phpdoc_to_comment' => false,
-                   'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
                    'trailing_comma_in_multiline' => ['elements' => ['arrays', 'arguments', 'parameters']],
                    'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
                    'operator_linebreak' => ['position' => 'beginning', 'only_booleans' => true],
                    'types_spaces' => ['space' => 'single'],
                    'class_definition' => ['single_line' => true,'space_before_parenthesis' => true,],
-                   'php_unit_test_case_static_method_calls ' => ['call_type' => 'this'],
+                   'php_unit_test_case_static_method_calls' => ['call_type' => 'this'],
                ])
     ;
