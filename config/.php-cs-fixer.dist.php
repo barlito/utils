@@ -40,5 +40,6 @@ return (new PhpCsFixer\Config())
                    'operator_linebreak' => ['position' => 'beginning', 'only_booleans' => true],
                    'types_spaces' => ['space' => 'single'],
                    'class_definition' => ['single_line' => true,'space_before_parenthesis' => true,],
+                   'php_unit_test_case_static_method_calls ' => ['call_type' => 'this'],
                ])
     ;
