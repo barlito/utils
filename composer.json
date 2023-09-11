@@ -3,7 +3,11 @@
   "description": "My personal library of utilities",
   "type": "package",
   "require": {
-    "php": ">=8.0.2"
+    "php": ">=8.0.2",
+    "doctrine/orm": "^2.16",
+    "symfony/doctrine-bridge": "^6.3",
+    "symfony/serializer": "^6.3",
+    "symfony/validator": "^6.3"
   },
   "license": "mit",
   "authors": [
