@@ -3,11 +3,13 @@
   "description": "My personal library of utilities",
   "type": "package",
   "require": {
-    "php": ">=8.0.2",
+    "php": ">=8.1",
     "doctrine/orm": "^2.16",
     "symfony/doctrine-bridge": "^6.3",
     "symfony/serializer": "^6.3",
-    "symfony/validator": "^6.3"
+    "symfony/validator": "^6.3",
+    "symfony/property-access": "^6.3",
+    "symfony/framework-bundle": "^6.3"
   },
   "license": "mit",
   "authors": [
@@ -21,5 +23,9 @@
     "psr-4": {
       "Barlito\\Utils\\": "src/"
     }
+  },
+  "require-dev": {
+    "behat/behat": "^3.13",
+    "phpunit/phpunit": "^10.3"
   }
 }
