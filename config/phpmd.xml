@@ -27,6 +27,12 @@
     <!-- Clean code exclude StaticAccess -->
     <rule ref="rulesets/cleancode.xml">
         <exclude name="StaticAccess" />
+        <exclude name="MissingImport" />
+    </rule>
+    <rule ref="rulesets/cleancode.xml/MissingImport">
+        <properties>
+            <property name="ignore-global" value="true"/>
+        </properties>
     </rule>
 
     <!-- Include everything from CleanCode and configure CyclomaticComplexity -->
