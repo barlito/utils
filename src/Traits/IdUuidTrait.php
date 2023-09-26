@@ -17,9 +17,9 @@ trait IdUuidTrait
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[Assert\Uuid]
     #[Groups(['default'])]
-    private ?string $id;
+    private ?string $id = null;
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

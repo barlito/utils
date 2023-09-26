@@ -6,7 +6,6 @@ namespace Barlito\Utils\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
-use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -18,9 +17,9 @@ trait IdUlidTrait
     #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     #[Assert\Ulid]
     #[Groups(['default'])]
-    private ?string $id;
+    private ?string $id = null;
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
