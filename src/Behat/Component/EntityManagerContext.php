@@ -5,21 +5,25 @@ declare(strict_types=1);
 namespace Barlito\Utils\Behat\Component;
 
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
-use DateTime;
-use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
-use JsonException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 final class EntityManagerContext extends TestCase implements Context
 {
-    public function __construct(protected EntityManagerInterface $entityManager, protected string $entityNamespace)
-    {
-        parent::__construct('EntityManager Behat Context');
+    public function __construct(
+        protected EntityManagerInterface $entityManager,
+        protected SerializerInterface $serializer,
+        protected string $entityNamespace,
+    ) {
+        parent::__construct();
     }
 
     /**
@@ -53,9 +57,10 @@ final class EntityManagerContext extends TestCase implements Context
 
     private function assertRow(string $path, mixed $expected, mixed $entity): void
     {
+        $expected = $this->parseExpected($expected);
         $assert = 'assertEquals';
 
-        $actualValue = $this->getValueAtPath($entity, $path);
+        $actualValue = $this->getValueAtPath($entity, $path, false);
 
         $callable = [$this, $assert];
         if (!\is_callable($callable)) {
@@ -79,7 +84,7 @@ final class EntityManagerContext extends TestCase implements Context
             if (str_contains($key, ':')) {
                 $parts = explode(':', $key);
                 if (2 !== \count($parts)) {
-                    throw new RuntimeException(
+                    throw new \RuntimeException(
                         sprintf(
                             'Invalid type identifier given to look for an entity "%s"',
                             $key,
@@ -106,7 +111,7 @@ final class EntityManagerContext extends TestCase implements Context
         }
 
         return match ($type) {
-            'date' => new DateTime($value),
+            'date' => new \DateTime($value),
             default => $value,
         };
     }
@@ -116,33 +121,90 @@ final class EntityManagerContext extends TestCase implements Context
         return $this->entityManager->getRepository($this->entityNamespace . '\\' . $entityClass);
     }
 
-    /**
-     * @param mixed $input
-     * @throws JsonException
-     */
     private function getAsString($input): string
     {
-        if ($input instanceof DateTimeInterface) {
+        if ($input instanceof \DateTimeInterface) {
             return $input->format(DATE_ATOM);
         }
 
-        return \is_array($input) && false !== json_encode($input, JSON_THROW_ON_ERROR) ?
-            json_encode($input, JSON_THROW_ON_ERROR) :
-            (string) $input
-        ;
+        if ($input instanceof \UnitEnum) {
+            return $input->value;
+        }
+
+        return \is_array($input) && false !== json_encode($input) ?
+            json_encode($input) :
+            (string) $input;
     }
 
     /**
-     * @param mixed $entity
-     * @param string $path
      * @return mixed|null
      */
-    private function getValueAtPath(mixed $entity, string $path): mixed
+    private function getValueAtPath($entity, string $path, bool $allowMissingPath)
     {
-        return PropertyAccess::createPropertyAccessorBuilder()
-            ->enableExceptionOnInvalidIndex()
-            ->getPropertyAccessor()
-            ->getValue($entity, $path)
-        ;
+        try {
+            return PropertyAccess::createPropertyAccessorBuilder()
+                ->enableExceptionOnInvalidIndex()
+                ->getPropertyAccessor()
+                ->getValue($entity, $path)
+                ;
+        } catch (AccessException | NoSuchIndexException $e) {
+            if (!$allowMissingPath) {
+                throw $e;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @Then I create a ":entityClass" entity with data:
+     */
+    public function iCreateAEntityWithData($entityClass, PyStringNode $data): void
+    {
+        $entity = $this->serializer->deserialize($data->getRaw(), $this->getRepository($entityClass)->getClassName(), 'json');
+
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @Given I should find :count :entityClass entity found by :findByQueryString
+     */
+    public function iShouldFindEntityWithParams(int $number, string $entityClass, string $findByQueryString): void
+    {
+        $findBy = $this->parseFindByQueryString($findByQueryString);
+        $this->entityManager->clear();
+        $entities = $this->getRepository($entityClass)->findBy($findBy);
+
+        $this->assertCount($number, $entities, sprintf('Found %d entities instead of %d', \count($entities), $number));
+    }
+
+    private function parseExpected(mixed $expected): mixed
+    {
+        if (\is_string($expected) && str_starts_with($expected, '!php/enum')) {
+            $enum = substr($expected, 10);
+            if ($useValue = str_ends_with($enum, '->value')) {
+                $enum = substr($enum, 0, -7);
+            }
+            if (!\defined($enum)) {
+                throw new ParseException(sprintf('The enum "%s" is not defined.', $enum));
+            }
+
+            $value = \constant($enum);
+
+            if (!$value instanceof \UnitEnum) {
+                throw new ParseException(sprintf('The string "%s" is not the name of a valid enum.', $enum));
+            }
+            if (!$useValue) {
+                return $value;
+            }
+            if (!$value instanceof \BackedEnum) {
+                throw new ParseException(sprintf('The enum "%s" defines no value next to its name.', $enum));
+            }
+
+            return $value->value;
+        }
+
+        return $expected;
     }
 }
