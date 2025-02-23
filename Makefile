@@ -9,11 +9,11 @@ bash:
 
 .PHONY: deploy
 deploy:
-	docker-compose up -d
+	docker compose up -d
 
 .PHONY: undeploy
 undeploy:
-	docker-compose down
+	docker compose down
 
 .Phone: restart
 restart:
@@ -22,4 +22,4 @@ restart:
 
 .PHONY: logs
 logs:
-	docker-compose logs -f
+	docker compose logs -f
