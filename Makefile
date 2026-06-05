@@ -15,7 +15,7 @@ deploy:
 undeploy:
 	docker compose down
 
-.Phone: restart
+.PHONY: restart
 restart:
 	make undeploy
 	make deploy
@@ -35,3 +35,11 @@ rector:
 .PHONY: rector-fix
 rector-fix:
 	docker exec $(app_container_id) composer rector:fix
+
+.PHONY: cs
+cs:
+	docker exec $(app_container_id) composer cs
+
+.PHONY: cs-fix
+cs-fix:
+	docker exec $(app_container_id) composer cs:fix

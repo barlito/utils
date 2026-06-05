@@ -10,8 +10,8 @@ return RectorConfig::configure()
     ])
     ->withCache(__DIR__ . '/var/cache/rector')
     ->withRootFiles()
-    ->withPhpSets(php82: true)
-    ->withComposerBased(doctrine: true, symfony: true, phpunit: true)
+    ->withPhpSets(php84: true)
+    ->withComposerBased(doctrine: true, phpunit: true, symfony: true)
     ->withAttributesSets(symfony: true, doctrine: true, phpunit: true)
     ->withPreparedSets(
         deadCode: true,

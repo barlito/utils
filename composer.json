@@ -1,9 +1,9 @@
 {
   "name": "barlito/utils",
   "description": "My personal library of utilities",
-  "type": "package",
+  "type": "library",
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "doctrine/orm": "^3",
     "symfony/doctrine-bridge": "^7.0 || ^8.0",
     "symfony/serializer": "^7.0 || ^8.0",
@@ -28,7 +28,8 @@
   "require-dev": {
     "roave/security-advisories": "dev-latest",
     "behat/behat": "^3.13",
-    "phpunit/phpunit": "^10|^11",
+    "phpunit/phpunit": "^11 || ^12",
+    "friendsofphp/php-cs-fixer": "^3.92",
     "phpstan/phpstan": "^2.2",
     "phpstan/phpstan-symfony": "^2.0",
     "phpstan/phpstan-doctrine": "^2.0",
@@ -37,6 +38,7 @@
     "rector/rector": "^2.4"
   },
   "config": {
+    "sort-packages": true,
     "allow-plugins": {
       "phpstan/extension-installer": true
     }
@@ -45,6 +47,8 @@
     "phpstan": "phpstan analyse",
     "phpstan:baseline": "phpstan analyse --generate-baseline",
     "rector": "rector process --dry-run",
-    "rector:fix": "rector process"
+    "rector:fix": "rector process",
+    "cs": "php-cs-fixer fix --config=config/.php-cs-fixer.dist.php --dry-run --diff",
+    "cs:fix": "php-cs-fixer fix --config=config/.php-cs-fixer.dist.php"
   }
 }
