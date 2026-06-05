@@ -8,4 +8,9 @@
 
 ###> tools cache ###
 /var/
+/.php-cs-fixer.cache
 ###< tools cache ###
+
+###> editor backups ###
+*~
+###< editor backups ###
