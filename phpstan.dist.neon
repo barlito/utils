@@ -1,6 +1,4 @@
 # Extensions (symfony, doctrine, phpunit) are auto-loaded via phpstan/extension-installer
-includes:
-    - phpstan-baseline.neon
 
 parameters:
     level: 8
@@ -9,5 +7,9 @@ parameters:
         - src
 
     tmpDir: var/cache/phpstan
+
+    ignoreErrors:
+        # Library traits are consumed by downstream projects, never internally
+        - identifier: trait.unused
 
     treatPhpDocTypesAsCertain: false

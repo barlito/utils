@@ -9,21 +9,20 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 
-final class EntityManagerContext extends TestCase implements Context
+class EntityManagerContext implements Context
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected SerializerInterface $serializer,
         protected string $entityNamespace,
     ) {
-        parent::__construct();
     }
 
     /**
@@ -34,6 +33,7 @@ final class EntityManagerContext extends TestCase implements Context
         $findBy = $this->parseFindByQueryString($findByQueryString);
         $this->entityManager->clear();
         $entity = $this->getRepository($entityClass)->findOneBy($findBy);
+        Assert::assertNotNull($entity, 'Entity not found.');
         $this->valueShouldMatch($entity, $table);
     }
 
@@ -45,7 +45,7 @@ final class EntityManagerContext extends TestCase implements Context
         $findBy = $this->parseFindByQueryString($findByQueryString);
         $this->entityManager->clear();
         $entity = $this->getRepository($entityClass)->findOneBy($findBy);
-        $this->assertNull($entity, 'Entity found.');
+        Assert::assertNull($entity, 'Entity found.');
     }
 
     private function valueShouldMatch(object $entity, TableNode $table): void
@@ -58,16 +58,10 @@ final class EntityManagerContext extends TestCase implements Context
     private function assertRow(string $path, mixed $expected, mixed $entity): void
     {
         $expected = $this->parseExpected($expected);
-        $assert = 'assertEquals';
 
         $actualValue = $this->getValueAtPath($entity, $path, false);
 
-        $callable = [$this, $assert];
-        if (!\is_callable($callable)) {
-            return;
-        }
-
-        $callable($expected, $actualValue, sprintf(
+        Assert::assertEquals($expected, $actualValue, \sprintf(
             "The element '%s' value '%s' is not equal to expected '%s'",
             $path,
             $this->getAsString($actualValue),
@@ -75,27 +69,29 @@ final class EntityManagerContext extends TestCase implements Context
         ));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function parseFindByQueryString(string $findByQueryString): array
     {
-        parse_str($findByQueryString, $findBy);
+        parse_str($findByQueryString, $parsed);
 
-        foreach ($findBy as $key => $value) {
+        $findBy = [];
+        foreach ($parsed as $key => $value) {
+            $key = (string) $key;
             $type = null;
             if (str_contains($key, ':')) {
                 $parts = explode(':', $key);
                 if (2 !== \count($parts)) {
                     throw new \RuntimeException(
-                        sprintf(
+                        \sprintf(
                             'Invalid type identifier given to look for an entity "%s"',
                             $key,
                         ),
                     );
                 }
 
-                unset($findBy[$key]);
-
-                $key = $parts[0];
-                $type = $parts[1];
+                [$key, $type] = $parts;
             }
 
             $findBy[$key] = $this->handleQueryStringTypeHinting($value, $type);
@@ -104,7 +100,7 @@ final class EntityManagerContext extends TestCase implements Context
         return $findBy;
     }
 
-    private function handleQueryStringTypeHinting(mixed $value, string $type = null): mixed
+    private function handleQueryStringTypeHinting(mixed $value, ?string $type = null): mixed
     {
         if ('null' === $value) {
             return null;
@@ -116,19 +112,29 @@ final class EntityManagerContext extends TestCase implements Context
         };
     }
 
+    /**
+     * @return ObjectRepository<object>
+     */
     protected function getRepository(string $entityClass): ObjectRepository
     {
-        return $this->entityManager->getRepository($this->entityNamespace . '\\' . $entityClass);
+        /** @var class-string<object> $fqcn */
+        $fqcn = $this->entityNamespace . '\\' . $entityClass;
+
+        return $this->entityManager->getRepository($fqcn);
     }
 
-    private function getAsString($input): string
+    private function getAsString(mixed $input): string
     {
         if ($input instanceof \DateTimeInterface) {
             return $input->format(DATE_ATOM);
         }
 
+        if ($input instanceof \BackedEnum) {
+            return (string) $input->value;
+        }
+
         if ($input instanceof \UnitEnum) {
-            return $input->value;
+            return $input->name;
         }
 
         return \is_array($input) && false !== json_encode($input) ?
@@ -136,17 +142,14 @@ final class EntityManagerContext extends TestCase implements Context
             (string) $input;
     }
 
-    /**
-     * @return mixed|null
-     */
-    private function getValueAtPath($entity, string $path, bool $allowMissingPath)
+    private function getValueAtPath(mixed $entity, string $path, bool $allowMissingPath): mixed
     {
         try {
             return PropertyAccess::createPropertyAccessorBuilder()
                 ->enableExceptionOnInvalidIndex()
                 ->getPropertyAccessor()
                 ->getValue($entity, $path)
-                ;
+            ;
         } catch (AccessException | NoSuchIndexException $e) {
             if (!$allowMissingPath) {
                 throw $e;
@@ -159,7 +162,7 @@ final class EntityManagerContext extends TestCase implements Context
     /**
      * @Then I create a ":entityClass" entity with data:
      */
-    public function iCreateAEntityWithData($entityClass, PyStringNode $data): void
+    public function iCreateAEntityWithData(string $entityClass, PyStringNode $data): void
     {
         $entity = $this->serializer->deserialize($data->getRaw(), $this->getRepository($entityClass)->getClassName(), 'json');
 
@@ -176,7 +179,7 @@ final class EntityManagerContext extends TestCase implements Context
         $this->entityManager->clear();
         $entities = $this->getRepository($entityClass)->findBy($findBy);
 
-        $this->assertCount($number, $entities, sprintf('Found %d entities instead of %d', \count($entities), $number));
+        Assert::assertCount($number, $entities, \sprintf('Found %d entities instead of %d', \count($entities), $number));
     }
 
     private function parseExpected(mixed $expected): mixed
@@ -187,19 +190,19 @@ final class EntityManagerContext extends TestCase implements Context
                 $enum = substr($enum, 0, -7);
             }
             if (!\defined($enum)) {
-                throw new ParseException(sprintf('The enum "%s" is not defined.', $enum));
+                throw new ParseException(\sprintf('The enum "%s" is not defined.', $enum));
             }
 
             $value = \constant($enum);
 
             if (!$value instanceof \UnitEnum) {
-                throw new ParseException(sprintf('The string "%s" is not the name of a valid enum.', $enum));
+                throw new ParseException(\sprintf('The string "%s" is not the name of a valid enum.', $enum));
             }
             if (!$useValue) {
                 return $value;
             }
             if (!$value instanceof \BackedEnum) {
-                throw new ParseException(sprintf('The enum "%s" defines no value next to its name.', $enum));
+                throw new ParseException(\sprintf('The enum "%s" defines no value next to its name.', $enum));
             }
 
             return $value->value;
