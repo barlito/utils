@@ -1,0 +1,13 @@
+# Extensions (symfony, doctrine, phpunit) are auto-loaded via phpstan/extension-installer
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 8
+
+    paths:
+        - src
+
+    tmpDir: var/cache/phpstan
+
+    treatPhpDocTypesAsCertain: false

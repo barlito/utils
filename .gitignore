@@ -5,3 +5,7 @@
 ###> vendor ###
 /vendor/
 ###< vendor ###
+
+###> tools cache ###
+/var/
+###< tools cache ###
