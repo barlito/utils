@@ -10,10 +10,8 @@ if (file_exists('phpcs-local-config.php')) {
 // https://cs.symfony.com/doc/rules/index.html
 
 $finder = PhpCsFixer\Finder::create()
-    ->in([
-             'src',
-             'tests',
-         ])->notPath($classesToSkip);
+    ->in(array_filter(['src', 'tests'], 'is_dir'))
+    ->notPath($classesToSkip)
 ;
 
 return (new PhpCsFixer\Config())

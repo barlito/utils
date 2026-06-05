@@ -6,14 +6,13 @@ namespace Barlito\Utils\Behat\Component;
 
 use Barlito\Utils\Behat\Mock\LoggerMock;
 use Behat\Behat\Context\Context;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\Assert;
 
-class LoggerContext extends KernelTestCase implements Context
+class LoggerContext implements Context
 {
     public function __construct(
-        private readonly LoggerMock $logger
+        private readonly LoggerMock $logger,
     ) {
-        parent::__construct('Logger Behat Context');
     }
 
     /**
@@ -21,8 +20,9 @@ class LoggerContext extends KernelTestCase implements Context
      */
     public function theLoggerLoggedTheErrorWithMessage(string $message): void
     {
-        $this->assertNotNull(
-            $this->logger->getLoggedMessage($message), "Error with message '" . $message . "' is not logged by the logger"
+        Assert::assertNotNull(
+            $this->logger->getLoggedMessage($message),
+            "Error with message '" . $message . "' is not logged by the logger",
         );
     }
 
@@ -31,8 +31,9 @@ class LoggerContext extends KernelTestCase implements Context
      */
     public function theLoggerLoggedAnErrorContaining(string $message): void
     {
-        $this->assertNotNull(
-            $this->logger->containsLoggedMessage($message), "Error with message '" . $message . "' is not logged by the logger"
+        Assert::assertNotNull(
+            $this->logger->containsLoggedMessage($message),
+            "Error with message '" . $message . "' is not logged by the logger",
         );
     }
 

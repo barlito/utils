@@ -1,0 +1,15 @@
+# Shareable PHPStan settings — include this from your project's phpstan.dist.neon:
+#
+#     includes:
+#         - vendor/barlito/utils/config/phpstan.neon
+#
+#     parameters:
+#         paths:
+#             - src
+#
+# Intentionally contains no `paths` / `tmpDir`: those resolve relative to this
+# file, so they must be defined by the including project.
+parameters:
+    level: 8
+
+    treatPhpDocTypesAsCertain: false
