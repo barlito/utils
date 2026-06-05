@@ -23,3 +23,15 @@ restart:
 .PHONY: logs
 logs:
 	docker compose logs -f
+
+.PHONY: phpstan
+phpstan:
+	docker exec $(app_container_id) composer phpstan
+
+.PHONY: rector
+rector:
+	docker exec $(app_container_id) composer rector
+
+.PHONY: rector-fix
+rector-fix:
+	docker exec $(app_container_id) composer rector:fix
