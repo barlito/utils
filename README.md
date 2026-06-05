@@ -57,6 +57,37 @@ Then the logger logged the error with message "Something went wrong"
 Then the logger logged an error containing "went wrong"
 ```
 
+### Reusable QA configs
+
+The `config/` directory ships ready-to-use QA configs for consuming projects (install the tools in your own `require-dev`):
+
+**PHPStan** — `phpstan.dist.neon`:
+
+```neon
+includes:
+    - vendor/barlito/utils/config/phpstan.neon
+
+parameters:
+    paths:
+        - src
+```
+
+**Rector** — `rector.php`:
+
+```php
+$builder = require 'vendor/barlito/utils/config/rector.php';
+
+return $builder
+    ->withPaths([__DIR__ . '/src'])
+    ->withCache(__DIR__ . '/var/cache/rector');
+```
+
+**PHP-CS-Fixer** — run with the shipped config (paths resolve from your project root):
+
+```bash
+vendor/bin/php-cs-fixer fix --config=vendor/barlito/utils/config/.php-cs-fixer.dist.php
+```
+
 ## Development
 
 ```bash

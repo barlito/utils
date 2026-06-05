@@ -2,21 +2,12 @@
 
 declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+// Lib-local config — shared rules live in config/rector.php (reusable by consumers)
+$builder = require __DIR__ . '/config/rector.php';
 
-return RectorConfig::configure()
+return $builder
     ->withPaths([
         __DIR__ . '/src',
     ])
-    ->withCache(__DIR__ . '/var/cache/rector')
     ->withRootFiles()
-    ->withPhpSets(php84: true)
-    ->withComposerBased(doctrine: true, phpunit: true, symfony: true)
-    ->withAttributesSets(symfony: true, doctrine: true, phpunit: true)
-    ->withPreparedSets(
-        deadCode: true,
-        codeQuality: true,
-        typeDeclarations: true,
-        earlyReturn: true,
-    )
-    ->withImportNames(importShortClasses: false, removeUnusedImports: true);
+    ->withCache(__DIR__ . '/var/cache/rector');

@@ -1,8 +1,9 @@
+# Lib-local config — shared rules live in config/phpstan.neon (reusable by consumers)
 # Extensions (symfony, doctrine, phpunit) are auto-loaded via phpstan/extension-installer
+includes:
+    - config/phpstan.neon
 
 parameters:
-    level: 8
-
     paths:
         - src
 
@@ -11,5 +12,3 @@ parameters:
     ignoreErrors:
         # Library traits are consumed by downstream projects, never internally
         - identifier: trait.unused
-
-    treatPhpDocTypesAsCertain: false
