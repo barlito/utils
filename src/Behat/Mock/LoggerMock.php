@@ -9,6 +9,8 @@ use Stringable;
 
 /**
  * @phpstan-type LoggedMessage array{message: string | Stringable, context: array<mixed>, level: mixed}
+ *
+ * @SuppressWarnings("PHPMD.TooManyPublicMethods")
  */
 class LoggerMock implements LoggerInterface
 {

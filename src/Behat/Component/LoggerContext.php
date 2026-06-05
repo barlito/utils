@@ -21,7 +21,8 @@ class LoggerContext implements Context
     public function theLoggerLoggedTheErrorWithMessage(string $message): void
     {
         Assert::assertNotNull(
-            $this->logger->getLoggedMessage($message), "Error with message '" . $message . "' is not logged by the logger",
+            $this->logger->getLoggedMessage($message),
+            "Error with message '" . $message . "' is not logged by the logger",
         );
     }
 
@@ -31,7 +32,8 @@ class LoggerContext implements Context
     public function theLoggerLoggedAnErrorContaining(string $message): void
     {
         Assert::assertNotNull(
-            $this->logger->containsLoggedMessage($message), "Error with message '" . $message . "' is not logged by the logger",
+            $this->logger->containsLoggedMessage($message),
+            "Error with message '" . $message . "' is not logged by the logger",
         );
     }
 

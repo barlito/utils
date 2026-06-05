@@ -20,7 +20,9 @@
     </rule>
     <rule ref="rulesets/design.xml/CouplingBetweenObjects">
         <properties>
+            <!-- "minimum" is the legacy name of this property, kept for old phpmd versions -->
             <property name="minimum" value="25" />
+            <property name="maximum" value="25" />
         </properties>
     </rule>
 

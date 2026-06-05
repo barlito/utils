@@ -43,3 +43,15 @@ cs:
 .PHONY: cs-fix
 cs-fix:
 	docker exec $(app_container_id) composer cs:fix
+
+.PHONY: phpcs
+phpcs:
+	docker exec $(app_container_id) composer phpcs
+
+.PHONY: phpmd
+phpmd:
+	docker exec $(app_container_id) composer phpmd
+
+.PHONY: qa
+qa:
+	docker exec $(app_container_id) composer qa

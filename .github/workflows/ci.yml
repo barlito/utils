@@ -39,3 +39,9 @@ jobs:
 
             -   name: Rector
                 run: vendor/bin/rector process --dry-run
+
+            -   name: PHPCS
+                run: vendor/bin/phpcs --standard=config/phpcs.xml.dist src
+
+            -   name: PHPMD
+                run: composer phpmd

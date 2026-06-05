@@ -109,6 +109,9 @@ make cs            # coding standards check (php-cs-fixer, @Symfony)
 make cs-fix        # apply coding standards
 make rector        # rector dry-run
 make rector-fix    # apply rector rules
+make phpcs         # PSR-12 check (phpcs)
+make phpmd         # mess detection (phpmd, isolated via vendor-bin)
+make qa            # run the whole QA suite
 ```
 
 The same commands are available as composer scripts (`composer phpstan`, `composer cs`, `composer rector`, ...).

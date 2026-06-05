@@ -186,7 +186,8 @@ class EntityManagerContext implements Context
     {
         if (\is_string($expected) && str_starts_with($expected, '!php/enum')) {
             $enum = substr($expected, 10);
-            if ($useValue = str_ends_with($enum, '->value')) {
+            $useValue = str_ends_with($enum, '->value');
+            if ($useValue) {
                 $enum = substr($enum, 0, -7);
             }
             if (!\defined($enum)) {

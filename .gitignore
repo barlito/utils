@@ -4,11 +4,13 @@
 
 ###> vendor ###
 /vendor/
+/vendor-bin/*/vendor/
 ###< vendor ###
 
 ###> tools cache ###
 /var/
 /.php-cs-fixer.cache
+.phpcs-cache
 ###< tools cache ###
 
 ###> editor backups ###
