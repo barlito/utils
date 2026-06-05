@@ -143,3 +143,9 @@ parameters:
 			identifier: trait.unused
 			count: 1
 			path: src/Traits/IdUuidTrait.php
+
+		-
+			message: '#^Trait Barlito\\Utils\\Traits\\TimestampableTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Traits/TimestampableTrait.php
