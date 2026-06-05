@@ -88,6 +88,18 @@ return $builder
 vendor/bin/php-cs-fixer fix --config=vendor/barlito/utils/config/.php-cs-fixer.dist.php
 ```
 
+**PHPCS** (PSR-12):
+
+```bash
+vendor/bin/phpcs --standard=vendor/barlito/utils/config/phpcs.xml.dist src
+```
+
+**PHPMD**:
+
+```bash
+vendor/bin/phpmd src text vendor/barlito/utils/config/phpmd.xml
+```
+
 ## Development
 
 ```bash
