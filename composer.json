@@ -1,9 +1,9 @@
 {
   "name": "barlito/utils",
   "description": "My personal library of utilities",
-  "type": "package",
+  "type": "library",
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "doctrine/orm": "^3",
     "gedmo/doctrine-extensions": "^3.8",
     "symfony/doctrine-bridge": "^7.0 || ^8.0",
@@ -27,25 +27,48 @@
     }
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
+    "bamarni/composer-bin-plugin": "^1.9",
     "behat/behat": "^3.13",
-    "phpunit/phpunit": "^10|^11",
+    "friendsofphp/php-cs-fixer": "^3.92",
+    "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.2",
-    "phpstan/phpstan-symfony": "^2.0",
     "phpstan/phpstan-doctrine": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
-    "phpstan/extension-installer": "^1.4",
-    "rector/rector": "^2.4"
+    "phpstan/phpstan-symfony": "^2.0",
+    "phpunit/phpunit": "^11 || ^12",
+    "rector/rector": "^2.4",
+    "roave/security-advisories": "dev-latest",
+    "squizlabs/php_codesniffer": "^4.0"
   },
   "config": {
+    "sort-packages": true,
     "allow-plugins": {
-      "phpstan/extension-installer": true
+      "phpstan/extension-installer": true,
+      "bamarni/composer-bin-plugin": true
+    }
+  },
+  "extra": {
+    "bamarni-bin": {
+      "bin-links": true,
+      "forward-command": true
     }
   },
   "scripts": {
     "phpstan": "phpstan analyse",
     "phpstan:baseline": "phpstan analyse --generate-baseline",
     "rector": "rector process --dry-run",
-    "rector:fix": "rector process"
+    "rector:fix": "rector process",
+    "cs": "php-cs-fixer fix --config=config/.php-cs-fixer.dist.php --dry-run --diff",
+    "cs:fix": "php-cs-fixer fix --config=config/.php-cs-fixer.dist.php",
+    "phpcs": "phpcs --standard=config/phpcs.xml.dist src",
+    "phpcs:fix": "phpcbf --standard=config/phpcs.xml.dist src",
+    "phpmd": "php -d error_reporting='E_ALL & ~E_DEPRECATED' vendor/bin/phpmd src text config/phpmd.xml",
+    "qa": [
+      "@phpstan",
+      "@cs",
+      "@rector",
+      "@phpcs",
+      "@phpmd"
+    ]
   }
 }

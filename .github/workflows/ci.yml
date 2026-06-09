@@ -1,0 +1,47 @@
+name: CI
+
+on:
+    push:
+        branches: [master]
+    pull_request: ~
+
+jobs:
+    qa:
+        name: QA (PHP ${{ matrix.php }})
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php: ['8.4']
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    coverage: none
+
+            -   name: Install dependencies
+                uses: ramsey/composer-install@v3
+
+            -   name: Validate composer.json
+                run: composer validate --no-check-publish
+
+            -   name: Security audit
+                run: composer audit
+
+            -   name: PHPStan
+                run: vendor/bin/phpstan analyse --no-progress
+
+            -   name: PHP-CS-Fixer
+                run: vendor/bin/php-cs-fixer fix --config=config/.php-cs-fixer.dist.php --dry-run --diff
+
+            -   name: Rector
+                run: vendor/bin/rector process --dry-run
+
+            -   name: PHPCS
+                run: vendor/bin/phpcs --standard=config/phpcs.xml.dist src
+
+            -   name: PHPMD
+                run: composer phpmd
